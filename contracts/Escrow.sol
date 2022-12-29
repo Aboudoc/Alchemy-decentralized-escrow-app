@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+/** @title A  contract for escrow
+ * @author Reda Aboutika
+ * @notice This contract is to demo a simple escrow contract
+ */
 contract Escrow {
     // State variables
     address public depositor;
