@@ -18,6 +18,8 @@ contract Escrow {
     address public arbiter;
     bool public isApproved;
     Status private s_status;
+    uint256 private s_totalApproved;
+    uint256 private s_totalRefund;
 
     enum Status {
         PENDING,
@@ -46,6 +48,7 @@ contract Escrow {
         require(success);
         s_status = Status.APPROVED;
         isApproved = true;
+        s_totalApproved++;
         emit Approved(balance);
     }
 
@@ -60,6 +63,7 @@ contract Escrow {
         uint balance = address(this).balance;
         (bool success, ) = depositor.call{value: balance}("");
         require(success);
+        s_totalRefund++;
         emit Refunded(balance);
     }
 
@@ -71,5 +75,17 @@ contract Escrow {
             revert Escrow__NotPending();
         }
         s_status = Status.DISPUTTED;
+    }
+
+    function getStatus() public view returns (Status) {
+        return s_status;
+    }
+
+    function getTotalApproved() public view returns (uint) {
+        return s_totalApproved;
+    }
+
+    function getTotalRefund() public view returns (uint) {
+        return s_totalApproved;
     }
 }
