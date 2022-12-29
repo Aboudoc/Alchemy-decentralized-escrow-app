@@ -23,6 +23,7 @@ contract Escrow {
 
     enum Status {
         PENDING,
+        CONFIRMED,
         APPROVED,
         DISPUTTED,
         REFUNDED
@@ -38,6 +39,9 @@ contract Escrow {
         s_status = Status.PENDING;
     }
 
+    /**
+     * @notice Allows the arbiter to approve the transaction and send the balance to the beneficiary
+     */
     function approve() external {
         require(msg.sender == arbiter);
         if (s_status == Status.APPROVED) {
@@ -52,6 +56,9 @@ contract Escrow {
         emit Approved(balance);
     }
 
+    /**
+     * @notice Allows the arbiter to refund the depositor if the claim is accepted
+     */
     function refund() external {
         if (msg.sender != arbiter) {
             revert Escrow__NotTheArbiter();
@@ -67,6 +74,22 @@ contract Escrow {
         emit Refunded(balance);
     }
 
+    /**
+     * @notice Allows the depositor to confirm the transaction
+     */
+    function confirm() external {
+        if (msg.sender != depositor) {
+            revert Escrow__NotTheDepositor();
+        }
+        if (s_status != Status.PENDING) {
+            revert Escrow__NotPending();
+        }
+        s_status = Status.CONFIRMED;
+    }
+
+    /**
+     * @notice Allows the depositor to open a claim and "pause" the transaction
+     */
     function claim() external {
         if (msg.sender != depositor) {
             revert Escrow__NotTheDepositor();
@@ -86,6 +109,6 @@ contract Escrow {
     }
 
     function getTotalRefund() public view returns (uint) {
-        return s_totalApproved;
+        return s_totalRefund;
     }
 }
