@@ -43,7 +43,9 @@ contract Escrow {
      * @notice Allows the arbiter to approve the transaction and send the balance to the beneficiary
      */
     function approve() external {
-        require(msg.sender == arbiter);
+        if (msg.sender != arbiter) {
+            revert Escrow__NotTheArbiter();
+        }
         if (s_status == Status.APPROVED) {
             revert Escrow__AlreadyApproved();
         }
